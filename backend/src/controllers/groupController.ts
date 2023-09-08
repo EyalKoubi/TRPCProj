@@ -108,24 +108,28 @@ export async function add(big_group: string, small_group: string) {
 }
 
 // define function that delete group
-export async function deleteg(group: any, req: Request, res: Response) {
-  if (group === null) return res.send("The group doesn't exists!");
+export async function deleteg(id: string) {
+  const groupTodelete = await Groups.findById(id);
 
-  for (let i = 0; i < group.persons_ids.length; i++)
-    await Persons.updateOne(
-      { _id: group.persons_ids[i] },
-      { $pull: { belongs_to: group._id } }
-    );
+  if (!groupTodelete) return "The group doesn't exists!";
 
-  for (let i = 0; i < group.groups_ids.length; i++) {
-    let son = await Groups.findById(group.groups_ids[i]);
-    marko(son);
-    await Groups.findOneAndDelete(group.groups_ids[i]);
+  for (let i = 0; i < groupTodelete.persons_ids.length; i++) {
+    const member = await Persons.findById(groupTodelete.persons_ids[i]);
+    if (member)
+      await Persons.updateOne(
+        { _id: groupTodelete.persons_ids[i] },
+        { $pull: { belongs_to: groupTodelete._id } }
+      );
   }
 
-  await Groups.findOneAndDelete(group._id);
+  for (let i = 0; i < groupTodelete.groups_ids.length; i++) {
+    let son = await Groups.findById(groupTodelete.groups_ids[i]);
+    marko(son);
+  }
 
-  return res.send("The group: " + group.group_name + " removed successfully!");
+  await Groups.findOneAndDelete(groupTodelete._id);
+
+  return `The group: ${groupTodelete.group_name} removed successfully!`;
 }
 
 // define function that remove group from another group
@@ -169,18 +173,10 @@ export const getAllGroups = async () => {
   return groups;
 };
 
-export const rename = async (
-  res: Response<any, Record<string, any>>,
-  id: string,
-  newName: string
-) => {
-  const all_groups = await Groups.find({});
-  for (let i = 0; i < all_groups.length; i++) {
-    if (newName === all_groups[i].group_name)
-      return res.send("Group with that name already exists!");
-  }
+export const rename = async (id: string, newName: string) => {
+  const groupBefore = await Groups.findById(id);
   await Groups.updateOne({ _id: id }, { group_name: newName });
-  return res.send("Update succeed!");
+  return `Group name channged to ${newName} from ${groupBefore?.group_name} successfully!`;
 };
 
 export const getSons = async (groupName: string) => {

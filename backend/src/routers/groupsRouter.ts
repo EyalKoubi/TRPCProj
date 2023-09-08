@@ -24,9 +24,17 @@ export const groups_router = t.router({
       return await groupCont.create(input.groupName);
     }
   ),
+  renameGroup: group_validators.renameGroupProcedure.mutation(
+    async ({ input }) => {
+      return await groupCont.rename(input.id, input.newName);
+    }
+  ),
   addGroupToGroup: group_validators.twoGroupsNamesProcedure.mutation(
     async ({ input }) => {
       return await groupCont.add(input.bigGroupName, input.smallGroupName);
     }
   ),
+  deleteGroup: group_validators.groupIdProcedure.mutation(async ({ input }) => {
+    return await groupCont.deleteg(input.id);
+  }),
 });

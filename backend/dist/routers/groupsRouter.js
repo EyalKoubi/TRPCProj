@@ -43,7 +43,13 @@ exports.groups_router = trpc_1.t.router({
     createGroup: validators_1.group_validators.groupNameProcedure.mutation(async ({ input }) => {
         return await groupCont.create(input.groupName);
     }),
+    renameGroup: validators_1.group_validators.renameGroupProcedure.mutation(async ({ input }) => {
+        return await groupCont.rename(input.id, input.newName);
+    }),
     addGroupToGroup: validators_1.group_validators.twoGroupsNamesProcedure.mutation(async ({ input }) => {
         return await groupCont.add(input.bigGroupName, input.smallGroupName);
+    }),
+    deleteGroup: validators_1.group_validators.groupIdProcedure.mutation(async ({ input }) => {
+        return await groupCont.deleteg(input.id);
     }),
 });
