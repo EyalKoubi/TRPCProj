@@ -37,4 +37,9 @@ export const groups_router = t.router({
   deleteGroup: group_validators.groupIdProcedure.mutation(async ({ input }) => {
     return await groupCont.deleteg(input.id);
   }),
+  groupRemoveFromGroup: group_validators.twoGroupsNamesProcedure.mutation(
+    async ({ input }) => {
+      return await groupCont.removeg(input.bigGroupName, input.smallGroupName);
+    }
+  ),
 });

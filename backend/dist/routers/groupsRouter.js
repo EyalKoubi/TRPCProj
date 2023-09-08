@@ -52,4 +52,7 @@ exports.groups_router = trpc_1.t.router({
     deleteGroup: validators_1.group_validators.groupIdProcedure.mutation(async ({ input }) => {
         return await groupCont.deleteg(input.id);
     }),
+    groupRemoveFromGroup: validators_1.group_validators.twoGroupsNamesProcedure.mutation(async ({ input }) => {
+        return await groupCont.removeg(input.bigGroupName, input.smallGroupName);
+    }),
 });

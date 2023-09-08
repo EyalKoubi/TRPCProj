@@ -140,22 +140,18 @@ async function deleteg(id) {
 }
 exports.deleteg = deleteg;
 // define function that remove group from another group
-async function removeg(big_group, small_group, req, res) {
+async function removeg(big_group, small_group) {
     let first_group = await models_1.Groups.findOne({ group_name: big_group });
     let second_group = await models_1.Groups.findOne({ group_name: small_group });
     if (!first_group)
-        return res.send("The big group doesn't exists!");
+        return "The big group doesn't exists!";
     if (!second_group)
-        return res.send("The small group doesn't exists!");
+        return "The small group doesn't exists!";
     if (!first_group.groups_ids.includes(second_group._id))
-        return res.send("The big group doesn't includes the small group!");
+        return "The big group doesn't includes the small group!";
     await models_1.Groups.updateOne({ _id: first_group._id }, { $pull: { groups_ids: second_group._id } });
     await models_1.Groups.updateOne({ _id: second_group._id }, { have_father: false });
-    return res.send("Group: " +
-        small_group +
-        " removed from group: " +
-        first_group.group_name +
-        " successfully!");
+    return `Group ${small_group} removed from ${big_group} successfully!`;
 }
 exports.removeg = removeg;
 // define function that make 'have_father'
