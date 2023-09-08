@@ -34,33 +34,39 @@ export async function hyrar(groupName: string) {
   let currentGroupLevel = [group];
   let degree = 1;
   let result = "";
-  let newGroupLevel: any[] = [];
+  let newGroupLevel = [];
 
   while (currentGroupLevel.length !== 0) {
     newGroupLevel = [];
     result += `Degree number ${degree}:\n`;
     for (let i = 0; i < currentGroupLevel.length; i++) {
       if (currentGroupLevel[i]) {
-        result += `Group number ${i} is: ${currentGroupLevel[i].group_name}\n`;
+        result += `Group number ${i + 1} is ${
+          currentGroupLevel[i].group_name
+        }\n`;
         for (let j = 0; j < currentGroupLevel[i].groups_ids.length; j++) {
-          const subGroup: any = Groups.findById(
+          const subGroup = await Groups.findById(
             currentGroupLevel[i].groups_ids[j]
           );
-          if (newGroupLevel) newGroupLevel.push(subGroup);
+          if (subGroup) {
+            newGroupLevel.push(subGroup);
+          }
         }
         if (currentGroupLevel[i].persons_ids.length > 0)
           result += `Her persons:\n`;
-        for (let j = 0; j < currentGroupLevel[i].persons_ids.length; j++) {
-          const personFromGroup: any = Persons.findById(
-            currentGroupLevel[i].persons_ids[j]
+        for (let k = 0; k < currentGroupLevel[i].persons_ids.length; k++) {
+          const person = await Persons.findById(
+            currentGroupLevel[i].persons_ids[k]
           );
-          if (personFromGroup)
-            result += `Person number ${j}: ${personFromGroup.first_name} ${personFromGroup.last_name}}`;
+          if (person) {
+            result += `Person number ${k + 1} is ${person.first_name} ${
+              person.last_name
+            }\n`;
+          }
         }
-      } else {
-        return `I felt on degree number: ${degree}`;
       }
     }
+    result += `\n\n`;
     currentGroupLevel = newGroupLevel;
     degree++;
   }

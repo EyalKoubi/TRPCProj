@@ -20,6 +20,7 @@
     "ts-node-dev": "^2.0.0"
   },
   "dependencies": {
+    "@trpc/client": "^10.38.1",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "env-var": "^7.3.1",

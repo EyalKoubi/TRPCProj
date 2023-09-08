@@ -29,83 +29,87 @@ const models_1 = require("../models");
 const helpers = __importStar(require("../helpers"));
 // define function that search
 // specific person in specific group
-async function searchPinG(personName, groupName, res) {
+async function searchPinG(personName, groupName) {
+    const strings = personName.split(" ");
+    if (strings.length !== 2)
+        return "Invalid input";
+    const [first, last] = strings;
     let group = await models_1.Groups.findOne({ group_name: groupName });
     let person = await models_1.Persons.findOne({
-        first_name: personName[0],
-        last_name: personName[1],
+        first_name: first,
+        last_name: last,
     });
     if (!group)
-        return res.send("The group doesn't exists!");
+        return `The group ${groupName} doesn't exists!`;
     if (!person)
-        return res.send("The person dosn't exists!");
+        return `The person ${personName} dosn't exists!`;
     if (await helpers.PersonSearch(group, person._id))
-        return res.send("The person is in the group in some way.");
-    return res.send("The person is not in the group at all.");
+        return `The person ${personName} is in the group ${groupName} in some way.`;
+    return `The person ${personName} is not in the group ${groupName} at all.`;
 }
 exports.searchPinG = searchPinG;
 // define function that for a specific
 // person show the whole groups that
 // it belongs to them
-async function his(personName, req, res) {
+async function his(personName) {
+    const strings = personName.split(" ");
+    if (strings.length !== 2)
+        return "Invalid input";
+    const [first, last] = strings;
     let person = await models_1.Persons.findOne({
-        first_name: personName[0],
-        last_name: personName[1],
+        first_name: first,
+        last_name: last,
     });
     let result = "";
     if (!person)
-        return res.send("The person dosn't exists!");
+        return `The person ${personName} dosn't exists!`;
     for (let i = 0; i < person.belongs_to.length; i++) {
         const group = await models_1.Groups.findById(person.belongs_to[i]);
         if (group)
-            result += "Group number " + (i + 1) + " is: " + (group === null || group === void 0 ? void 0 : group.group_name) + "\n";
+            result += `Group number ${i + 1} is: ${group === null || group === void 0 ? void 0 : group.group_name}\n`;
     }
-    return res.send(result);
+    return result;
 }
 exports.his = his;
 // define function that add person to group
-async function addPtoG(personName, groupName, res) {
+async function addPtoG(personName, groupName) {
+    const strings = personName.split(" ");
+    if (strings.length !== 2)
+        return "Invalid input";
+    const [first, last] = strings;
     let group = await models_1.Groups.findOne({ group_name: groupName });
     let person = await models_1.Persons.findOne({
-        first_name: personName[0],
-        last_name: personName[1],
+        first_name: first,
+        last_name: last,
     });
     if (!group)
-        return res.send("The group doesn't exists!");
+        return `The group ${groupName} doesn't exists!`;
     if (!person)
-        return res.send("The person dosn't exists!");
+        return `The person ${personName} dosn't exists!`;
     await models_1.Persons.updateOne({ _id: person._id }, { $addToSet: { belongs_to: group._id } });
     await models_1.Groups.updateOne({ _id: group._id }, { $addToSet: { persons_ids: person._id } });
-    return res.send("Person: " +
-        person.first_name +
-        " " +
-        person.last_name +
-        " added to group: " +
-        group.group_name +
-        " successfully!");
+    return `Person: ${first} ${last} added to group ${groupName} successfully!`;
 }
 exports.addPtoG = addPtoG;
 // define function that remove person from group
-async function removePfromG(personName, groupName, res) {
+async function removePfromG(personName, groupName) {
+    const strings = personName.split(" ");
+    if (strings.length !== 2)
+        return "Invalid input";
+    const [first, last] = strings;
     let group = await models_1.Groups.findOne({ group_name: groupName });
     let person = await models_1.Persons.findOne({
-        first_name: personName[0],
-        last_name: personName[1],
+        first_name: first,
+        last_name: last,
     });
     if (!group)
-        return res.send("The group doesn't exists!");
+        return `The group ${groupName} doesn't exists!`;
     if (!person)
-        return res.send("The person dosn't exists!");
+        return `The person ${personName} dosn't exists!`;
     if (!group.persons_ids.includes(person._id))
-        return res.send("The group doesn't includes the person!");
+        return `The group ${groupName} doesn't includes the person ${personName}!`;
     await models_1.Persons.updateOne({ _id: person._id }, { $pull: { belongs_to: group._id } });
     await models_1.Groups.updateOne({ _id: group._id }, { $pull: { persons_ids: person._id } });
-    return res.send("Person: " +
-        person.first_name +
-        " " +
-        person.last_name +
-        " removed from group: " +
-        group.group_name +
-        " successfully!");
+    return `Person ${first} ${last} removed from group: ${groupName} successfully!`;
 }
 exports.removePfromG = removePfromG;
